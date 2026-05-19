@@ -1,33 +1,57 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { StockData } from '@/types';
+import { usePolling } from '@/hooks/usePolling';
 import MetricCard from './MetricCard';
 import SignalBadge from './SignalBadge';
 import PriceChart from './PriceChart';
 import HeadlineList from './HeadlineList';
+import SentimentInsightCard from './SentimentInsightCard';
+import OutlookCard from './OutlookCard';
+
+const POLL_INTERVAL_MS = 45_000;
 
 export default function Dashboard({ ticker }: { ticker: string }) {
-  const [data, setData] = useState<StockData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [data, setData]             = useState<StockData | null>(null);
+  const [loading, setLoading]       = useState(true);
+  const [error, setError]           = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [secondsAgo, setSecondsAgo] = useState(0);
 
+  const doFetch = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/stock/${encodeURIComponent(ticker)}`);
+      if (!res.ok) {
+        const e = await res.json();
+        throw new Error(e.error ?? 'Not found');
+      }
+      setData(await res.json());
+      setLastUpdated(new Date());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load data');
+    }
+  }, [ticker]);
+
+  // Full reset + initial load on ticker change
   useEffect(() => {
     setLoading(true);
     setError(null);
     setData(null);
+    setLastUpdated(null);
+    doFetch().finally(() => setLoading(false));
+  }, [ticker, doFetch]);
 
-    fetch(`/api/stock/${encodeURIComponent(ticker)}`)
-      .then((res) => {
-        if (!res.ok) return res.json().then((e) => Promise.reject(e.error ?? 'Not found'));
-        return res.json() as Promise<StockData>;
-      })
-      .then(setData)
-      .catch((err: unknown) =>
-        setError(typeof err === 'string' ? err : 'Failed to load data'),
-      )
-      .finally(() => setLoading(false));
-  }, [ticker]);
+  // Silent background polling (no loading spinner on refresh)
+  usePolling(doFetch, POLL_INTERVAL_MS);
+
+  // "Updated Xs ago" counter — resets every time a fetch succeeds
+  useEffect(() => {
+    if (!lastUpdated) return;
+    setSecondsAgo(0);
+    const id = setInterval(() => setSecondsAgo((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, [lastUpdated]);
 
   if (loading) return <Skeleton />;
 
@@ -40,15 +64,13 @@ export default function Dashboard({ ticker }: { ticker: string }) {
     );
   }
 
-  const sentimentPct = Math.round(data.sentimentScore * 100);
+  const sentimentPct   = Math.round(data.sentimentScore * 100);
   const sentimentClass =
-    data.sentimentScore > 0.1
-      ? 'text-green-600'
-      : data.sentimentScore < -0.1
-        ? 'text-red-600'
-        : 'text-gray-700';
+    data.sentimentScore > 0.1  ? 'text-green-600'
+    : data.sentimentScore < -0.1 ? 'text-red-600'
+    : 'text-gray-700';
 
-  const priceChangeClass = data.priceChangePercent >= 0 ? 'text-green-600' : 'text-red-600';
+  const priceChangeClass  = data.priceChangePercent >= 0 ? 'text-green-600' : 'text-red-600';
   const priceChangePrefix = data.priceChangePercent >= 0 ? '+' : '';
 
   return (
@@ -57,9 +79,7 @@ export default function Dashboard({ ticker }: { ticker: string }) {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 flex-wrap">
-            <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">
-              {data.ticker}
-            </h2>
+            <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">{data.ticker}</h2>
             <SignalBadge signal={data.signal} />
           </div>
           <p className="text-gray-500 mt-1">{data.companyName}</p>
@@ -69,26 +89,41 @@ export default function Dashboard({ ticker }: { ticker: string }) {
             ${data.currentPrice.toFixed(2)}
           </p>
           <p className={`text-sm font-semibold mt-0.5 tabular-nums ${priceChangeClass}`}>
-            {priceChangePrefix}
-            {data.priceChangePercent.toFixed(2)}% today
+            {priceChangePrefix}{data.priceChangePercent.toFixed(2)}% today
           </p>
         </div>
       </div>
 
-      {/* Metric cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <MetricCard
-          label="Mentions (24 h)"
-          value={data.mentionCount.toLocaleString()}
-          subtitle="Across news & social media"
-        />
-        <MetricCard
-          label="Sentiment Score"
-          value={sentimentPct > 0 ? `+${sentimentPct}` : String(sentimentPct)}
-          valueClassName={sentimentClass}
-          subtitle="−100 very bearish · +100 very bullish"
-        />
+      {/* Metric cards + live indicator */}
+      <div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <MetricCard
+            label="Mentions (24 h)"
+            value={data.mentionCount.toLocaleString()}
+            subtitle="Across news & social media"
+          />
+          <MetricCard
+            label="Sentiment Score"
+            value={sentimentPct > 0 ? `+${sentimentPct}` : String(sentimentPct)}
+            valueClassName={sentimentClass}
+            subtitle="−100 very bearish · +100 very bullish"
+          />
+        </div>
+        {lastUpdated && (
+          <div className="flex items-center gap-1.5 mt-2 ml-1">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+            </span>
+            <span className="text-xs text-gray-400">
+              Simulated live · updated {secondsAgo}s ago
+            </span>
+          </div>
+        )}
       </div>
+
+      {/* Sentiment analysis */}
+      <SentimentInsightCard explanation={data.sentimentExplanation} />
 
       {/* Price chart */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
@@ -98,10 +133,13 @@ export default function Dashboard({ ticker }: { ticker: string }) {
         <PriceChart data={data.priceHistory} />
       </div>
 
+      {/* Outlook + recommendation */}
+      <OutlookCard outlook={data.priceOutlook} recommendation={data.recommendation} />
+
       {/* Headlines */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
-          Recent Headlines & Mentions
+          Recent Headlines &amp; Mentions
         </p>
         <HeadlineList headlines={data.headlines} />
       </div>
@@ -130,7 +168,9 @@ function Skeleton() {
         <div className="h-28 bg-gray-200 rounded-xl" />
         <div className="h-28 bg-gray-200 rounded-xl" />
       </div>
+      <div className="h-32 bg-gray-200 rounded-xl" />
       <div className="h-72 bg-gray-200 rounded-xl" />
+      <div className="h-48 bg-gray-200 rounded-xl" />
       <div className="h-56 bg-gray-200 rounded-xl" />
     </div>
   );

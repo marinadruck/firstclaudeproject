@@ -32,43 +32,31 @@ const MOCK_DB: Record<string, StockData> = {
       185.20, 186.00, 184.30, 183.90, 184.50,
     ]),
     headlines: [
-      {
-        title: 'Apple Reports Record Q2 Earnings Driven by iPhone 16 Sales',
-        source: 'Reuters',
-        url: '#',
-        publishedAt: '2026-05-18',
-      },
-      {
-        title: 'Apple Vision Pro 2 Rumors Surface Ahead of WWDC',
-        source: 'TechCrunch',
-        url: '#',
-        publishedAt: '2026-05-17',
-      },
-      {
-        title: 'Analysts Raise Apple Price Target to $220 on AI Integration Plans',
-        source: 'Bloomberg',
-        url: '#',
-        publishedAt: '2026-05-16',
-      },
-      {
-        title: "Apple's Services Revenue Hits New High as App Store Grows 22% YoY",
-        source: 'CNBC',
-        url: '#',
-        publishedAt: '2026-05-15',
-      },
-      {
-        title: 'r/wallstreetbets: AAPL looking bullish into earnings — here is my DD',
-        source: 'Reddit',
-        url: '#',
-        publishedAt: '2026-05-14',
-      },
-      {
-        title: 'Apple Expands Manufacturing in India, Reducing China Dependency',
-        source: 'Financial Times',
-        url: '#',
-        publishedAt: '2026-05-13',
-      },
+      { title: 'Apple Reports Record Q2 Earnings Driven by iPhone 16 Sales', source: 'Reuters', url: '#', publishedAt: '2026-05-18' },
+      { title: 'Apple Vision Pro 2 Rumors Surface Ahead of WWDC', source: 'TechCrunch', url: '#', publishedAt: '2026-05-17' },
+      { title: 'Analysts Raise Apple Price Target to $220 on AI Integration Plans', source: 'Bloomberg', url: '#', publishedAt: '2026-05-16' },
+      { title: "Apple's Services Revenue Hits New High as App Store Grows 22% YoY", source: 'CNBC', url: '#', publishedAt: '2026-05-15' },
+      { title: 'r/wallstreetbets: AAPL looking bullish into earnings — here is my DD', source: 'Reddit', url: '#', publishedAt: '2026-05-14' },
+      { title: 'Apple Expands Manufacturing in India, Reducing China Dependency', source: 'Financial Times', url: '#', publishedAt: '2026-05-13' },
     ],
+    sentimentExplanation: {
+      summary: 'Mostly positive, driven by a strong earnings beat and anticipation of the upcoming WWDC developer conference.',
+      keyDrivers: [
+        'Q2 earnings exceeded analyst expectations on both revenue and EPS',
+        'Vision Pro 2 rumours building ahead of WWDC',
+        'Multiple analysts raised price targets citing AI integration roadmap',
+        'Services revenue hit a new all-time high',
+      ],
+    },
+    priceOutlook: {
+      direction: 'Bullish',
+      confidence: 'Medium',
+      explanation: 'Positive sentiment, high attention volume, and steady price appreciation over 30 days suggest continued upward momentum heading into WWDC season.',
+    },
+    recommendation: {
+      action: 'Monitor Closely',
+      reasoning: 'Positive signals across sentiment, attention, and price trend. Consider waiting for a clear breakout above recent highs before acting, rather than chasing current momentum.',
+    },
   },
 
   TSLA: {
@@ -88,49 +76,32 @@ const MOCK_DB: Record<string, StockData> = {
       244.10, 239.80, 246.30, 241.50, 248.90,
     ]),
     headlines: [
-      {
-        title: 'Tesla Cybertruck Demand Surges in Q1, Musk Says Production On Track',
-        source: 'Reuters',
-        url: '#',
-        publishedAt: '2026-05-18',
-      },
-      {
-        title: 'Tesla FSD v13 Achieves Major Milestone in Autonomous Driving Tests',
-        source: 'Electrek',
-        url: '#',
-        publishedAt: '2026-05-17',
-      },
-      {
-        title: 'Tesla Opens 500th Supercharger Station in Europe',
-        source: 'TechCrunch',
-        url: '#',
-        publishedAt: '2026-05-16',
-      },
-      {
-        title: 'Musk Announces Tesla Energy Storage Record Quarter — Up 180% YoY',
-        source: 'Bloomberg',
-        url: '#',
-        publishedAt: '2026-05-15',
-      },
-      {
-        title: 'r/stocks: TSLA short squeeze potential building — 15% of float short',
-        source: 'Reddit',
-        url: '#',
-        publishedAt: '2026-05-14',
-      },
-      {
-        title: 'Wall Street Divided on Tesla: Bulls See AI Play, Bears See Overvaluation',
-        source: 'WSJ',
-        url: '#',
-        publishedAt: '2026-05-13',
-      },
-      {
-        title: 'Tesla Model 3 Highland Refresh Earns 5-Star Safety Rating in Europe',
-        source: 'CNBC',
-        url: '#',
-        publishedAt: '2026-05-12',
-      },
+      { title: 'Tesla Cybertruck Demand Surges in Q1, Musk Says Production On Track', source: 'Reuters', url: '#', publishedAt: '2026-05-18' },
+      { title: 'Tesla FSD v13 Achieves Major Milestone in Autonomous Driving Tests', source: 'Electrek', url: '#', publishedAt: '2026-05-17' },
+      { title: 'Tesla Opens 500th Supercharger Station in Europe', source: 'TechCrunch', url: '#', publishedAt: '2026-05-16' },
+      { title: 'Musk Announces Tesla Energy Storage Record Quarter — Up 180% YoY', source: 'Bloomberg', url: '#', publishedAt: '2026-05-15' },
+      { title: 'r/stocks: TSLA short squeeze potential building — 15% of float short', source: 'Reddit', url: '#', publishedAt: '2026-05-14' },
+      { title: 'Wall Street Divided on Tesla: Bulls See AI Play, Bears See Overvaluation', source: 'WSJ', url: '#', publishedAt: '2026-05-13' },
+      { title: 'Tesla Model 3 Highland Refresh Earns 5-Star Safety Rating in Europe', source: 'CNBC', url: '#', publishedAt: '2026-05-12' },
     ],
+    sentimentExplanation: {
+      summary: 'Mixed sentiment — very high attention but divided opinion between FSD optimists and valuation sceptics.',
+      keyDrivers: [
+        'FSD v13 milestone driving excitement among long-term holders',
+        'Short interest at 15% of float creating potential squeeze conditions',
+        'Institutional analysts divided between growth narrative and overvaluation concerns',
+        'Energy storage business growth receiving less coverage than its results deserve',
+      ],
+    },
+    priceOutlook: {
+      direction: 'Bullish',
+      confidence: 'Low',
+      explanation: 'Very high mention volume and positive price momentum suggest short-term upward pressure, but mixed sentiment significantly reduces conviction in this outlook.',
+    },
+    recommendation: {
+      action: 'Wait for Confirmation',
+      reasoning: 'Extreme attention with divided sentiment often precedes sharp moves in either direction. Avoid reacting to social media hype alone — wait for a clear directional break in price before acting.',
+    },
   },
 
   NVDA: {
@@ -150,43 +121,31 @@ const MOCK_DB: Record<string, StockData> = {
       901.40, 915.60, 902.30, 889.70, 904.20,
     ]),
     headlines: [
-      {
-        title: 'Nvidia Blackwell GPUs Sell Out Through 2026, CEO Jensen Huang Confirms',
-        source: 'Reuters',
-        url: '#',
-        publishedAt: '2026-05-18',
-      },
-      {
-        title: 'Nvidia H200 NVL Adopted by All Major Cloud Providers Simultaneously',
-        source: 'The Verge',
-        url: '#',
-        publishedAt: '2026-05-17',
-      },
-      {
-        title: 'Nvidia AI Revenue Grows 400% YoY in Latest Quarterly Earnings',
-        source: 'Bloomberg',
-        url: '#',
-        publishedAt: '2026-05-16',
-      },
-      {
-        title: 'NVDA Technical Analysis: Stock Forms Cup-and-Handle on Daily Chart',
-        source: "Investor's Business Daily",
-        url: '#',
-        publishedAt: '2026-05-15',
-      },
-      {
-        title: 'Nvidia Expands Into AI Inference Market With New Software Stack',
-        source: 'TechCrunch',
-        url: '#',
-        publishedAt: '2026-05-14',
-      },
-      {
-        title: 'r/wallstreetbets: NVDA is the new oil — entered calls this morning',
-        source: 'Reddit',
-        url: '#',
-        publishedAt: '2026-05-13',
-      },
+      { title: 'Nvidia Blackwell GPUs Sell Out Through 2026, CEO Jensen Huang Confirms', source: 'Reuters', url: '#', publishedAt: '2026-05-18' },
+      { title: 'Nvidia H200 NVL Adopted by All Major Cloud Providers Simultaneously', source: 'The Verge', url: '#', publishedAt: '2026-05-17' },
+      { title: 'Nvidia AI Revenue Grows 400% YoY in Latest Quarterly Earnings', source: 'Bloomberg', url: '#', publishedAt: '2026-05-16' },
+      { title: 'NVDA Technical Analysis: Stock Forms Cup-and-Handle on Daily Chart', source: "Investor's Business Daily", url: '#', publishedAt: '2026-05-15' },
+      { title: 'Nvidia Expands Into AI Inference Market With New Software Stack', source: 'TechCrunch', url: '#', publishedAt: '2026-05-14' },
+      { title: 'r/wallstreetbets: NVDA is the new oil — entered calls this morning', source: 'Reddit', url: '#', publishedAt: '2026-05-13' },
     ],
+    sentimentExplanation: {
+      summary: 'Strongly positive — AI chip demand narrative is dominating both institutional research and retail attention.',
+      keyDrivers: [
+        'Blackwell GPU sellout confirms sustained enterprise demand well into 2026',
+        '400% YoY AI data centre revenue growth reported in latest earnings',
+        'All major cloud providers adopting H200 NVL architecture simultaneously',
+        'Bullish technical chart pattern forming on the daily timeframe',
+      ],
+    },
+    priceOutlook: {
+      direction: 'Bullish',
+      confidence: 'High',
+      explanation: 'Strong positive sentiment, consistent price appreciation over 30 days, and growing attention volume all point to continued institutional buying interest.',
+    },
+    recommendation: {
+      action: 'Compare with Fundamentals',
+      reasoning: 'All sentiment and attention signals are positive, but a meaningful portion of the good news may already be priced in. Compare current P/E against forward earnings estimates before acting.',
+    },
   },
 
   MSFT: {
@@ -206,37 +165,30 @@ const MOCK_DB: Record<string, StockData> = {
       430.50, 426.80, 432.90, 428.10, 435.60,
     ]),
     headlines: [
-      {
-        title: 'Microsoft Azure AI Revenue Tops $10B Quarterly Run Rate for First Time',
-        source: 'CNBC',
-        url: '#',
-        publishedAt: '2026-05-18',
-      },
-      {
-        title: 'Microsoft Copilot Reaches 100 Million Enterprise Users Milestone',
-        source: 'Reuters',
-        url: '#',
-        publishedAt: '2026-05-17',
-      },
-      {
-        title: 'Microsoft and OpenAI Extend Strategic Partnership Agreement Through 2030',
-        source: 'Bloomberg',
-        url: '#',
-        publishedAt: '2026-05-16',
-      },
-      {
-        title: 'Analysts Maintain Buy Rating on MSFT Despite Near-Term Valuation Concerns',
-        source: "Barron's",
-        url: '#',
-        publishedAt: '2026-05-15',
-      },
-      {
-        title: 'Microsoft Teams Surpasses Slack in Enterprise Adoption With New AI Features',
-        source: 'TechCrunch',
-        url: '#',
-        publishedAt: '2026-05-14',
-      },
+      { title: 'Microsoft Azure AI Revenue Tops $10B Quarterly Run Rate for First Time', source: 'CNBC', url: '#', publishedAt: '2026-05-18' },
+      { title: 'Microsoft Copilot Reaches 100 Million Enterprise Users Milestone', source: 'Reuters', url: '#', publishedAt: '2026-05-17' },
+      { title: 'Microsoft and OpenAI Extend Strategic Partnership Agreement Through 2030', source: 'Bloomberg', url: '#', publishedAt: '2026-05-16' },
+      { title: 'Analysts Maintain Buy Rating on MSFT Despite Near-Term Valuation Concerns', source: "Barron's", url: '#', publishedAt: '2026-05-15' },
+      { title: 'Microsoft Teams Surpasses Slack in Enterprise Adoption With New AI Features', source: 'TechCrunch', url: '#', publishedAt: '2026-05-14' },
     ],
+    sentimentExplanation: {
+      summary: 'Moderately positive — steady institutional coverage without the social media excitement seen in AI-adjacent peers.',
+      keyDrivers: [
+        'Azure AI revenue reached a meaningful new quarterly milestone',
+        'Copilot enterprise adoption growing steadily across Fortune 500 companies',
+        'OpenAI partnership extended, securing long-term AI pipeline advantage',
+        'Analyst consensus remains firmly Buy with low controversy or downside revisions',
+      ],
+    },
+    priceOutlook: {
+      direction: 'Neutral',
+      confidence: 'Medium',
+      explanation: 'Moderate attention and positive sentiment suggest stable, low-volatility price movement. No clear catalyst visible for a sharp move in either direction near-term.',
+    },
+    recommendation: {
+      action: 'No Urgent Action',
+      reasoning: 'Fundamentals appear solid and sentiment is positive, but low mention volume indicates limited near-term catalyst. This may suit a patient, long-term monitoring approach.',
+    },
   },
 
   GME: {
@@ -256,58 +208,52 @@ const MOCK_DB: Record<string, StockData> = {
       20.80, 22.30, 20.50, 18.90, 19.40,
     ]),
     headlines: [
-      {
-        title: 'GameStop Announces $1B Investment in Crypto and Digital Asset Infrastructure',
-        source: 'Reuters',
-        url: '#',
-        publishedAt: '2026-05-18',
-      },
-      {
-        title: 'Ryan Cohen Purchases Additional 5 Million GameStop Shares',
-        source: 'Bloomberg',
-        url: '#',
-        publishedAt: '2026-05-17',
-      },
-      {
-        title: 'r/wallstreetbets: GME 🚀🚀🚀 short interest back to 2021 levels — buckle up',
-        source: 'Reddit',
-        url: '#',
-        publishedAt: '2026-05-16',
-      },
-      {
-        title: 'GameStop Reports Surprise Profitable Quarter, Shares Surge 25% After-Hours',
-        source: 'CNBC',
-        url: '#',
-        publishedAt: '2026-05-15',
-      },
-      {
-        title: 'Short Interest in GameStop Reaches Highest Level Since January 2021',
-        source: 'Reuters',
-        url: '#',
-        publishedAt: '2026-05-14',
-      },
-      {
-        title: 'Roaring Kitty Posts Cryptic Tweet, GME Jumps 18% in Pre-Market Trading',
-        source: 'WSJ',
-        url: '#',
-        publishedAt: '2026-05-13',
-      },
-      {
-        title: 'GameStop Opens First Collectibles Pop-Up Store in New York City',
-        source: 'AP News',
-        url: '#',
-        publishedAt: '2026-05-12',
-      },
-      {
-        title: "r/stocks: GME fundamentals don't justify current price — bear thesis",
-        source: 'Reddit',
-        url: '#',
-        publishedAt: '2026-05-11',
-      },
+      { title: 'GameStop Announces $1B Investment in Crypto and Digital Asset Infrastructure', source: 'Reuters', url: '#', publishedAt: '2026-05-18' },
+      { title: 'Ryan Cohen Purchases Additional 5 Million GameStop Shares', source: 'Bloomberg', url: '#', publishedAt: '2026-05-17' },
+      { title: 'r/wallstreetbets: GME 🚀🚀🚀 short interest back to 2021 levels — buckle up', source: 'Reddit', url: '#', publishedAt: '2026-05-16' },
+      { title: 'GameStop Reports Surprise Profitable Quarter, Shares Surge 25% After-Hours', source: 'CNBC', url: '#', publishedAt: '2026-05-15' },
+      { title: 'Short Interest in GameStop Reaches Highest Level Since January 2021', source: 'Reuters', url: '#', publishedAt: '2026-05-14' },
+      { title: 'Roaring Kitty Posts Cryptic Tweet, GME Jumps 18% in Pre-Market Trading', source: 'WSJ', url: '#', publishedAt: '2026-05-13' },
+      { title: 'GameStop Opens First Collectibles Pop-Up Store in New York City', source: 'AP News', url: '#', publishedAt: '2026-05-12' },
+      { title: "r/stocks: GME fundamentals don't justify current price — bear thesis", source: 'Reddit', url: '#', publishedAt: '2026-05-11' },
     ],
+    sentimentExplanation: {
+      summary: 'High attention with mixed signals — meme-driven excitement is dominating, but a fundamental bear thesis is clearly visible beneath the surface.',
+      keyDrivers: [
+        'Ryan Cohen share purchase reignited retail investor interest significantly',
+        'Short interest back near January 2021 levels, creating squeeze narrative',
+        "Roaring Kitty's social post added substantial fuel to the price rally",
+        'Bear thesis counters visible in community discussion — weak underlying fundamentals',
+      ],
+    },
+    priceOutlook: {
+      direction: 'Bearish',
+      confidence: 'Low',
+      explanation: 'Extreme attention volume is driven by meme momentum rather than business fundamentals. Historically, price spikes of this type are unstable and tend to reverse sharply.',
+    },
+    recommendation: {
+      action: 'Avoid Reacting to Hype',
+      reasoning: 'GME exhibits classic meme-stock patterns: extreme social attention, short squeeze narrative, and weak underlying fundamentals. Decisions based on social sentiment alone carry very high risk.',
+    },
   },
 };
 
 export function getMockData(ticker: string): StockData | null {
   return MOCK_DB[ticker.toUpperCase()] ?? null;
+}
+
+// Adds small random variation to live-updating fields to simulate a data stream.
+// Insight text (sentimentExplanation, priceOutlook, recommendation) stays stable.
+export function applyMockVariation(data: StockData): StockData {
+  const newMentionCount = Math.max(0, data.mentionCount + Math.floor((Math.random() - 0.5) * 16));
+  const newSentimentScore = Math.max(-1, Math.min(1, data.sentimentScore + (Math.random() - 0.5) * 0.08));
+  const newPrice = Math.round((data.currentPrice + (Math.random() - 0.5) * 1.5) * 100) / 100;
+
+  return {
+    ...data,
+    mentionCount:   newMentionCount,
+    sentimentScore: newSentimentScore,
+    currentPrice:   newPrice,
+    signal:         computeSignal(newMentionCount, newSentimentScore),
+  };
 }

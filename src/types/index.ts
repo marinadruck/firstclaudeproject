@@ -12,6 +12,25 @@ export interface PricePoint {
 
 export type Signal = 'High Attention' | 'Watch' | 'Low Attention';
 
+export interface SentimentExplanation {
+  summary: string;
+  keyDrivers: string[];
+}
+
+export type OutlookDirection = 'Bullish' | 'Neutral' | 'Bearish';
+export type ConfidenceLevel = 'Low' | 'Medium' | 'High';
+
+export interface PriceOutlook {
+  direction: OutlookDirection;
+  confidence: ConfidenceLevel;
+  explanation: string;
+}
+
+export interface DecisionRecommendation {
+  action: string;
+  reasoning: string;
+}
+
 export interface StockData {
   ticker: string;
   companyName: string;
@@ -22,4 +41,7 @@ export interface StockData {
   signal: Signal;
   headlines: Headline[];
   priceHistory: PricePoint[];
+  sentimentExplanation: SentimentExplanation;
+  priceOutlook: PriceOutlook;
+  recommendation: DecisionRecommendation;
 }
