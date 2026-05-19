@@ -17,12 +17,14 @@ export default function Home({ searchParams }: PageProps) {
             Stock Pulse
           </h1>
           <SearchBar initialValue={ticker} />
-          <Link
-            href="/backtest"
-            className="ml-auto text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap shrink-0 transition-colors"
-          >
-            Backtest
-          </Link>
+          <nav className="ml-auto flex items-center gap-5 shrink-0">
+            <Link href="/backtest" className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap transition-colors">
+              Backtest
+            </Link>
+            <Link href="/ml" className="text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap transition-colors">
+              ML Model
+            </Link>
+          </nav>
         </div>
       </header>
 

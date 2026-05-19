@@ -64,6 +64,35 @@ export interface BacktestResult {
   metrics: BacktestMetrics;
 }
 
+export interface MLFeatureInput {
+  combinedSentimentScore: number;
+  priceChangePct: number;
+  newsMentionCount: number;
+  redditMentionCount: number;
+}
+
+export interface MLFeatureContribution {
+  name: string;
+  value: number;
+  contribution: number;
+}
+
+export interface MLPrediction {
+  ticker: string;
+  dataSource: 'mock';
+  predictionDate: string;
+  features: MLFeatureInput;
+  probabilityUp: number;
+  predictedDirection: OutlookDirection;
+  confidence: ConfidenceLevel;
+  expectedReturnPct: number;
+  featureContributions: MLFeatureContribution[];
+  modelExplanation: string;
+  trainingSize: number;
+  ruleBasedDirection: OutlookDirection;
+  ruleBasedAction: string;
+}
+
 export interface StockData {
   ticker: string;
   companyName: string;
