@@ -36,7 +36,9 @@ export interface StockData {
   companyName: string;
   currentPrice: number;
   priceChangePercent: number;
-  mentionCount: number;
+  mentionCount: number;        // total = newsMentionCount + redditMentionCount
+  newsMentionCount: number;
+  redditMentionCount: number;
   sentimentScore: number;
   signal: Signal;
   headlines: Headline[];

@@ -100,7 +100,7 @@ export default function Dashboard({ ticker }: { ticker: string }) {
           <MetricCard
             label="Mentions (24 h)"
             value={data.mentionCount.toLocaleString()}
-            subtitle="Across news & social media"
+            subtitle={`News: ${data.newsMentionCount} · Reddit: ${data.redditMentionCount}`}
           />
           <MetricCard
             label="Sentiment Score"

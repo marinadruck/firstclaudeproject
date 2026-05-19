@@ -27,11 +27,16 @@ Requires Node.js ≥ 18. Install via `brew install node` if not present.
 
 **Finnhub client:** `src/lib/finnhub.ts` — calls `/quote` for real-time price. Caches 30s server-side. Free tier only; `/stock/candle` (price history) requires a paid plan so `priceHistory` stays mock.
 
-**NewsAPI client:** `src/lib/newsapi.ts` — queries `/v2/everything` for up to 25 recent headlines per ticker, scores each headline with finance-specific positive/negative keywords, and generates `sentimentScore`, `mentionCount`, `sentimentExplanation`, and `headlines` from real article data. Caches 5 minutes. Falls back to mock sentiment on any error.
+**NewsAPI client:** `src/lib/newsapi.ts` — queries `/v2/everything` for up to 25 recent headlines per ticker, scores each with finance-specific positive/negative keywords (exported as `scoreHeadline`), and generates `newsMentionCount`, `sentimentExplanation`, and `headlines`. Caches 5 minutes. Falls back to mock on any error. Key in `NEWS_API_KEY` env var.
+
+**Reddit client:** `src/lib/reddit.ts` — fetches up to 25 posts each from r/wallstreetbets, r/stocks, and r/investing using the public unauthenticated `/search.json` endpoint (no API key required). Reuses `scoreHeadline` from newsapi.ts. Caches 5 minutes. Reddit failure falls back to news-only sentiment. Requires `User-Agent: StockSentimentDashboard/1.0` header.
+
+**Sentiment blending:** Combined `sentimentScore` = 70% news + 30% Reddit (computed in route.ts). `mentionCount` = total; `newsMentionCount` and `redditMentionCount` are per-source breakdowns shown in the UI subtitle.
 
 **Environment variables** in `.env.local` (never committed):
 - `FINNHUB_API_KEY` — free key from https://finnhub.io
 - `NEWS_API_KEY` — free key from https://newsapi.org (100 req/day on developer tier)
+- Reddit requires no API key — uses public unauthenticated endpoint
 
 **Signal logic:** `src/lib/signals.ts` — pure `computeSignal(mentionCount, sentimentScore)` function. Thresholds are constants at the top; easy to tune. Currently: ≥ 100 mentions → High Attention, ≤ 20 → Low Attention, otherwise Watch.
 

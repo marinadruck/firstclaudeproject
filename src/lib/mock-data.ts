@@ -21,6 +21,8 @@ const MOCK_DB: Record<string, StockData> = {
     currentPrice: 184.50,
     priceChangePercent: 0.33,
     mentionCount: 142,
+    newsMentionCount: 97,
+    redditMentionCount: 45,
     sentimentScore: 0.67,
     signal: computeSignal(142, 0.67),
     priceHistory: makePriceHistory([
@@ -65,6 +67,8 @@ const MOCK_DB: Record<string, StockData> = {
     currentPrice: 248.90,
     priceChangePercent: 3.07,
     mentionCount: 235,
+    newsMentionCount: 85,
+    redditMentionCount: 150,
     sentimentScore: 0.28,
     signal: computeSignal(235, 0.28),
     priceHistory: makePriceHistory([
@@ -110,6 +114,8 @@ const MOCK_DB: Record<string, StockData> = {
     currentPrice: 904.20,
     priceChangePercent: 1.63,
     mentionCount: 89,
+    newsMentionCount: 64,
+    redditMentionCount: 25,
     sentimentScore: 0.81,
     signal: computeSignal(89, 0.81),
     priceHistory: makePriceHistory([
@@ -154,6 +160,8 @@ const MOCK_DB: Record<string, StockData> = {
     currentPrice: 435.60,
     priceChangePercent: 1.75,
     mentionCount: 45,
+    newsMentionCount: 38,
+    redditMentionCount: 7,
     sentimentScore: 0.54,
     signal: computeSignal(45, 0.54),
     priceHistory: makePriceHistory([
@@ -197,6 +205,8 @@ const MOCK_DB: Record<string, StockData> = {
     currentPrice: 19.40,
     priceChangePercent: 2.65,
     mentionCount: 312,
+    newsMentionCount: 62,
+    redditMentionCount: 250,
     sentimentScore: 0.44,
     signal: computeSignal(312, 0.44),
     priceHistory: makePriceHistory([
@@ -245,15 +255,19 @@ export function getMockData(ticker: string): StockData | null {
 // Adds small random variation to live-updating fields to simulate a data stream.
 // Insight text (sentimentExplanation, priceOutlook, recommendation) stays stable.
 export function applyMockVariation(data: StockData): StockData {
-  const newMentionCount = Math.max(0, data.mentionCount + Math.floor((Math.random() - 0.5) * 16));
-  const newSentimentScore = Math.max(-1, Math.min(1, data.sentimentScore + (Math.random() - 0.5) * 0.08));
-  const newPrice = Math.round((data.currentPrice + (Math.random() - 0.5) * 1.5) * 100) / 100;
+  const newNewsMentionCount    = Math.max(0, data.newsMentionCount    + Math.floor((Math.random() - 0.5) * 8));
+  const newRedditMentionCount  = Math.max(0, data.redditMentionCount  + Math.floor((Math.random() - 0.5) * 10));
+  const newMentionCount        = newNewsMentionCount + newRedditMentionCount;
+  const newSentimentScore      = Math.max(-1, Math.min(1, data.sentimentScore + (Math.random() - 0.5) * 0.08));
+  const newPrice               = Math.round((data.currentPrice + (Math.random() - 0.5) * 1.5) * 100) / 100;
 
   return {
     ...data,
-    mentionCount:   newMentionCount,
-    sentimentScore: newSentimentScore,
-    currentPrice:   newPrice,
-    signal:         computeSignal(newMentionCount, newSentimentScore),
+    mentionCount:       newMentionCount,
+    newsMentionCount:   newNewsMentionCount,
+    redditMentionCount: newRedditMentionCount,
+    sentimentScore:     newSentimentScore,
+    currentPrice:       newPrice,
+    signal:             computeSignal(newMentionCount, newSentimentScore),
   };
 }

@@ -27,7 +27,7 @@ const NEGATIVE_KEYWORDS = [
   'slump', 'penalty', 'bankruptcy', 'bankrupt', 'trouble', 'fine',
 ];
 
-function scoreHeadline(title: string): number {
+export function scoreHeadline(title: string): number {
   const words = title.toLowerCase().split(/\W+/);
   let score = 0;
   for (const word of words) {
