@@ -47,8 +47,7 @@ export default function OutlookCard({ outlook, recommendation }: Props) {
 
       <div className="mt-4 pt-3 border-t border-gray-100">
         <p className="text-xs text-gray-400 leading-relaxed">
-          ⚠ Experimental estimate only — not a prediction or guarantee. This is not financial
-          advice. Always do your own research before making any investment decisions.
+          ⚠ Experimental decision-support signal only. Not financial advice.
         </p>
       </div>
     </div>

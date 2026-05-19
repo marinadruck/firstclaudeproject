@@ -38,6 +38,8 @@ Requires Node.js ≥ 18. Install via `brew install node` if not present.
 - `NEWS_API_KEY` — free key from https://newsapi.org (100 req/day on developer tier)
 - Reddit requires no API key — uses public unauthenticated endpoint
 
+**Recommendation engine:** `src/lib/recommendations.ts` — pure `computeRecommendation(input)` function. Takes `sentimentScore`, `mentionCount`, `newsMentionCount`, `redditMentionCount`, `signal`, and `priceChangePercent`; returns `priceOutlook` and `recommendation` using 12 priority-ordered rules (hype detection, bullish/bearish alignment, price–sentiment divergence). Called in route.ts after real sentiment is resolved; falls back to mock values if news fetch fails entirely.
+
 **Signal logic:** `src/lib/signals.ts` — pure `computeSignal(mentionCount, sentimentScore)` function. Thresholds are constants at the top; easy to tune. Currently: ≥ 100 mentions → High Attention, ≤ 20 → Low Attention, otherwise Watch.
 
 **Mock data:** `src/lib/mock-data.ts` — five tickers pre-seeded (AAPL, TSLA, NVDA, MSFT, GME) each with 30-day price history and 5–8 headlines. Unknown tickers return `null` → 404.

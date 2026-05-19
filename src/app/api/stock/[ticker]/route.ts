@@ -4,6 +4,7 @@ import { fetchRealPriceData } from '@/lib/finnhub';
 import { fetchRealSentimentData } from '@/lib/newsapi';
 import { fetchRedditSentimentData } from '@/lib/reddit';
 import { computeSignal } from '@/lib/signals';
+import { computeRecommendation } from '@/lib/recommendations';
 import type { Headline, SentimentExplanation } from '@/types';
 
 function buildSummary(
@@ -96,5 +97,18 @@ export async function GET(
     };
   }
 
-  return NextResponse.json({ ...mockBase, ...priceFields, ...sentimentFields });
+  const recommendationFields = ('sentimentScore' in sentimentFields)
+    ? computeRecommendation({
+        sentimentScore:     sentimentFields.sentimentScore!,
+        mentionCount:       sentimentFields.mentionCount!,
+        newsMentionCount:   sentimentFields.newsMentionCount!,
+        redditMentionCount: sentimentFields.redditMentionCount!,
+        signal:             sentimentFields.signal!,
+        priceChangePercent: priceResult.status === 'fulfilled'
+          ? priceResult.value.priceChangePercent
+          : mockBase.priceChangePercent,
+      })
+    : {};
+
+  return NextResponse.json({ ...mockBase, ...priceFields, ...sentimentFields, ...recommendationFields });
 }
