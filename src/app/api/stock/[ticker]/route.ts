@@ -17,13 +17,11 @@ export async function GET(
   }
 
   try {
-    const real             = await fetchRealPriceData(ticker);
-    const withMockVariation = applyMockVariation(base);
+    const real = await fetchRealPriceData(ticker);
     return NextResponse.json({
-      ...withMockVariation,
+      ...applyMockVariation(base),
       currentPrice:       real.currentPrice,
       priceChangePercent: real.priceChangePercent,
-      priceHistory:       real.priceHistory,
     });
   } catch (err) {
     console.warn(`[finnhub] Falling back to mock for ${ticker}:`, err);
