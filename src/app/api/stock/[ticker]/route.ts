@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMockData, applyMockVariation } from '@/lib/mock-data';
+import { fetchRealPriceData } from '@/lib/finnhub';
 
 export async function GET(
   _req: NextRequest,
   { params }: { params: { ticker: string } },
 ) {
   const ticker = params.ticker.toUpperCase();
-  const base = getMockData(ticker);
+  const base   = getMockData(ticker);
 
   if (!base) {
     return NextResponse.json(
@@ -15,7 +16,17 @@ export async function GET(
     );
   }
 
-  // Simulate a live data stream by adding small random variation on each request.
-  // When real APIs are connected, replace applyMockVariation with actual data fetching.
-  return NextResponse.json(applyMockVariation(base));
+  try {
+    const real             = await fetchRealPriceData(ticker);
+    const withMockVariation = applyMockVariation(base);
+    return NextResponse.json({
+      ...withMockVariation,
+      currentPrice:       real.currentPrice,
+      priceChangePercent: real.priceChangePercent,
+      priceHistory:       real.priceHistory,
+    });
+  } catch (err) {
+    console.warn(`[finnhub] Falling back to mock for ${ticker}:`, err);
+    return NextResponse.json(applyMockVariation(base));
+  }
 }

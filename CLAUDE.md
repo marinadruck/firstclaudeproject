@@ -23,7 +23,11 @@ Requires Node.js ≥ 18. Install via `brew install node` if not present.
 
 **Entry point:** `src/app/page.tsx` — server component that reads `?ticker=` from the URL and renders `<SearchBar>` + `<Dashboard>`. The ticker flows down as a prop; no client-side router state needed.
 
-**API:** `src/app/api/stock/[ticker]/route.ts` — single `GET` endpoint. Currently returns mock data from `src/lib/mock-data.ts`. To connect real APIs, only this file needs to change; components are fully decoupled from the data source.
+**API:** `src/app/api/stock/[ticker]/route.ts` — single `GET` endpoint. Fetches real price data from Finnhub (`currentPrice`, `priceChangePercent`, `priceHistory`) and overlays it on mock data (sentiment, mentions, headlines). Falls back to full mock on any Finnhub error.
+
+**Finnhub client:** `src/lib/finnhub.ts` — calls `/quote` and `/stock/candle`. Caches results 30s server-side to stay within Finnhub's 60 req/min free tier during the 45s polling loop.
+
+**Environment variable:** `FINNHUB_API_KEY` in `.env.local` (never committed). Without it the app falls back to mock price data silently. Get a free key at https://finnhub.io.
 
 **Signal logic:** `src/lib/signals.ts` — pure `computeSignal(mentionCount, sentimentScore)` function. Thresholds are constants at the top; easy to tune. Currently: ≥ 100 mentions → High Attention, ≤ 20 → Low Attention, otherwise Watch.
 
