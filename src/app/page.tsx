@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import SearchBar from '@/components/SearchBar';
 import PageContent from '@/components/PageContent';
 
@@ -16,6 +17,12 @@ export default function Home({ searchParams }: PageProps) {
             Stock Pulse
           </h1>
           <SearchBar initialValue={ticker} />
+          <Link
+            href="/backtest"
+            className="ml-auto text-sm text-gray-500 hover:text-gray-700 whitespace-nowrap shrink-0 transition-colors"
+          >
+            Backtest
+          </Link>
         </div>
       </header>
 
