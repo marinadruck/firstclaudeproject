@@ -140,7 +140,10 @@ export default function Dashboard({ ticker, isSaved, onToggleWatchlist }: Props)
       </div>
 
       {/* Sentiment analysis */}
-      <SentimentInsightCard explanation={data.sentimentExplanation} />
+      <SentimentInsightCard
+        explanation={data.sentimentExplanation}
+        advancedSentiment={data.advancedSentiment}
+      />
 
       {/* Price chart */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">

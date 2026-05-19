@@ -64,6 +64,27 @@ export interface BacktestResult {
   metrics: BacktestMetrics;
 }
 
+// Returned by scoreAdvancedSentiment() for a single text input.
+// Replace the body of that function with an async LLM/FinBERT call to upgrade later.
+export interface AdvancedSentimentResult {
+  label: 'Positive' | 'Neutral' | 'Negative';
+  score: number;            // -1.0 to +1.0
+  confidence: ConfidenceLevel;
+  explanation: string;
+  reasons: string[];        // which rules/signals fired
+  method: 'advanced-local';
+}
+
+// Aggregated across all headlines in one API response
+export interface AdvancedSentimentSummary {
+  score: number;
+  basicScore: number;       // original keyword-based score for comparison
+  label: 'Positive' | 'Neutral' | 'Negative';
+  confidence: ConfidenceLevel;
+  method: 'advanced-local';
+  topReasons: string[];     // deduplicated, sorted by frequency
+}
+
 export interface MLFeatureInput {
   combinedSentimentScore: number;
   priceChangePct: number;
@@ -108,4 +129,5 @@ export interface StockData {
   sentimentExplanation: SentimentExplanation;
   priceOutlook: PriceOutlook;
   recommendation: DecisionRecommendation;
+  advancedSentiment?: AdvancedSentimentSummary;
 }

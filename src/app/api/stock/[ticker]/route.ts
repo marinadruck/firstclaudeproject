@@ -5,7 +5,8 @@ import { fetchRealSentimentData } from '@/lib/newsapi';
 import { fetchRedditSentimentData } from '@/lib/reddit';
 import { computeSignal } from '@/lib/signals';
 import { computeRecommendation } from '@/lib/recommendations';
-import type { Headline, SentimentExplanation } from '@/types';
+import { aggregateAdvancedSentiment } from '@/lib/ai-sentiment';
+import type { Headline, SentimentExplanation, AdvancedSentimentSummary } from '@/types';
 
 function buildSummary(
   combined: number,
@@ -71,6 +72,7 @@ export async function GET(
     headlines: Headline[];
     sentimentExplanation: SentimentExplanation;
     signal: ReturnType<typeof computeSignal>;
+    advancedSentiment: AdvancedSentimentSummary;
   }> = {};
 
   if (newsResult.status === 'fulfilled') {
@@ -94,6 +96,10 @@ export async function GET(
       headlines:            allHeadlines,
       sentimentExplanation: { summary, keyDrivers },
       signal:               computeSignal(totalCount, combinedScore),
+      advancedSentiment:    aggregateAdvancedSentiment(
+        allHeadlines.map(h => h.title),
+        combinedScore,
+      ),
     };
   }
 
