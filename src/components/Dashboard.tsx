@@ -12,7 +12,13 @@ import OutlookCard from './OutlookCard';
 
 const POLL_INTERVAL_MS = 45_000;
 
-export default function Dashboard({ ticker }: { ticker: string }) {
+interface Props {
+  ticker: string;
+  isSaved: boolean;
+  onToggleWatchlist: (entry: { ticker: string; companyName: string }) => void;
+}
+
+export default function Dashboard({ ticker, isSaved, onToggleWatchlist }: Props) {
   const [data, setData]             = useState<StockData | null>(null);
   const [loading, setLoading]       = useState(true);
   const [error, setError]           = useState<string | null>(null);
@@ -81,6 +87,17 @@ export default function Dashboard({ ticker }: { ticker: string }) {
           <div className="flex items-center gap-3 flex-wrap">
             <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">{data.ticker}</h2>
             <SignalBadge signal={data.signal} />
+            <button
+              onClick={() => onToggleWatchlist({ ticker: data.ticker, companyName: data.companyName })}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-sm font-medium transition-colors ${
+                isSaved
+                  ? 'bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100'
+                  : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700'
+              }`}
+            >
+              <span>{isSaved ? '★' : '☆'}</span>
+              <span>{isSaved ? 'Saved' : 'Save'}</span>
+            </button>
           </div>
           <p className="text-gray-500 mt-1">{data.companyName}</p>
         </div>

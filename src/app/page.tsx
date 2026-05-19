@@ -1,5 +1,5 @@
 import SearchBar from '@/components/SearchBar';
-import Dashboard from '@/components/Dashboard';
+import PageContent from '@/components/PageContent';
 
 interface PageProps {
   searchParams: { ticker?: string };
@@ -20,21 +20,7 @@ export default function Home({ searchParams }: PageProps) {
       </header>
 
       <div className="max-w-5xl mx-auto px-4 py-8">
-        {ticker ? (
-          <Dashboard ticker={ticker} />
-        ) : (
-          <div className="text-center py-28">
-            <p className="text-3xl font-bold text-gray-800 mb-3">
-              Track stock attention & sentiment
-            </p>
-            <p className="text-gray-500 mb-2">
-              Enter a ticker symbol to see mention volume, sentiment, price history, and recent headlines.
-            </p>
-            <p className="text-sm text-gray-400">
-              Try: AAPL · TSLA · NVDA · MSFT · GME
-            </p>
-          </div>
-        )}
+        <PageContent ticker={ticker} />
       </div>
     </main>
   );
