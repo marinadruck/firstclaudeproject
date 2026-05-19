@@ -25,9 +25,13 @@ Requires Node.js ≥ 18. Install via `brew install node` if not present.
 
 **API:** `src/app/api/stock/[ticker]/route.ts` — single `GET` endpoint. Fetches real price data from Finnhub (`currentPrice`, `priceChangePercent`, `priceHistory`) and overlays it on mock data (sentiment, mentions, headlines). Falls back to full mock on any Finnhub error.
 
-**Finnhub client:** `src/lib/finnhub.ts` — calls `/quote` and `/stock/candle`. Caches results 30s server-side to stay within Finnhub's 60 req/min free tier during the 45s polling loop.
+**Finnhub client:** `src/lib/finnhub.ts` — calls `/quote` for real-time price. Caches 30s server-side. Free tier only; `/stock/candle` (price history) requires a paid plan so `priceHistory` stays mock.
 
-**Environment variable:** `FINNHUB_API_KEY` in `.env.local` (never committed). Without it the app falls back to mock price data silently. Get a free key at https://finnhub.io.
+**NewsAPI client:** `src/lib/newsapi.ts` — queries `/v2/everything` for up to 25 recent headlines per ticker, scores each headline with finance-specific positive/negative keywords, and generates `sentimentScore`, `mentionCount`, `sentimentExplanation`, and `headlines` from real article data. Caches 5 minutes. Falls back to mock sentiment on any error.
+
+**Environment variables** in `.env.local` (never committed):
+- `FINNHUB_API_KEY` — free key from https://finnhub.io
+- `NEWS_API_KEY` — free key from https://newsapi.org (100 req/day on developer tier)
 
 **Signal logic:** `src/lib/signals.ts` — pure `computeSignal(mentionCount, sentimentScore)` function. Thresholds are constants at the top; easy to tune. Currently: ≥ 100 mentions → High Attention, ≤ 20 → Low Attention, otherwise Watch.
 
