@@ -12,6 +12,14 @@ import {
 import type { PricePoint } from '@/types';
 
 export default function PriceChart({ data }: { data: PricePoint[] }) {
+  if (data.length === 0) {
+    return (
+      <div className="h-[220px] flex items-center justify-center text-sm text-gray-400">
+        Price history unavailable
+      </div>
+    );
+  }
+
   const prices = data.map((d) => d.price);
   const min = Math.min(...prices);
   const max = Math.max(...prices);

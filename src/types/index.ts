@@ -130,5 +130,4 @@ export interface StockData {
   priceOutlook: PriceOutlook;
   recommendation: DecisionRecommendation;
   advancedSentiment?: AdvancedSentimentSummary;
-  priceHistorySource?: 'real' | 'mock';
 }

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getMockData, applyMockVariation } from '@/lib/mock-data';
 import { fetchRealPriceData, fetchCompanyProfile } from '@/lib/finnhub';
 import { fetchPriceHistory } from '@/lib/alphavantage';
 import { fetchRealSentimentData } from '@/lib/newsapi';
@@ -46,36 +45,28 @@ export async function GET(
     }
     companyName = profile.companyName;
   } catch {
-    // Profile fetch failed (no key, network) — fall back to mock existence check
-    const mockFallback = getMockData(ticker);
-    if (!mockFallback) {
-      return NextResponse.json(
-        { error: `Ticker "${ticker}" not found. Enter any US stock ticker (e.g. AAPL, AMZN, GOOG)` },
-        { status: 404 },
-      );
-    }
-    companyName = mockFallback.companyName;
+    return NextResponse.json(
+      { error: `Ticker "${ticker}" not found. Enter any US stock ticker (e.g. AAPL, AMZN, GOOG)` },
+      { status: 404 },
+    );
   }
 
-  const mockData = getMockData(ticker);
-  const baseDefaults = mockData
-    ? { ...applyMockVariation(mockData), companyName }
-    : {
-        ticker,
-        companyName,
-        currentPrice: 0,
-        priceChangePercent: 0,
-        mentionCount: 0,
-        newsMentionCount: 0,
-        redditMentionCount: 0,
-        sentimentScore: 0,
-        signal: 'Watch' as Signal,
-        headlines: [],
-        priceHistory: [],
-        sentimentExplanation: { summary: 'Awaiting sentiment data.', keyDrivers: [] },
-        priceOutlook: { direction: 'Neutral' as OutlookDirection, confidence: 'Low' as ConfidenceLevel, explanation: 'Insufficient data to form an outlook.' },
-        recommendation: { action: 'Hold', reasoning: 'Insufficient data to make a recommendation.' },
-      };
+  const baseDefaults = {
+    ticker,
+    companyName,
+    currentPrice: 0,
+    priceChangePercent: 0,
+    mentionCount: 0,
+    newsMentionCount: 0,
+    redditMentionCount: 0,
+    sentimentScore: 0,
+    signal: 'Watch' as Signal,
+    headlines: [],
+    priceHistory: [],
+    sentimentExplanation: { summary: 'Awaiting sentiment data.', keyDrivers: [] },
+    priceOutlook: { direction: 'Neutral' as OutlookDirection, confidence: 'Low' as ConfidenceLevel, explanation: 'Insufficient data to form an outlook.' },
+    recommendation: { action: 'Hold', reasoning: 'Insufficient data to make a recommendation.' },
+  };
 
   const [priceResult, newsResult, redditResult, historyResult] = await Promise.allSettled([
     fetchRealPriceData(ticker),
@@ -98,10 +89,7 @@ export async function GET(
   }
 
   const realHistory        = historyResult.status === 'fulfilled' ? historyResult.value : null;
-  const priceHistoryFields = {
-    priceHistory:       realHistory ?? (mockData?.priceHistory ?? []),
-    priceHistorySource: (realHistory ? 'real' : 'mock') as 'real' | 'mock',
-  };
+  const priceHistoryFields = { priceHistory: realHistory ?? [] };
 
   const priceFields = priceResult.status === 'fulfilled'
     ? { currentPrice: priceResult.value.currentPrice, priceChangePercent: priceResult.value.priceChangePercent }
@@ -155,7 +143,7 @@ export async function GET(
         signal:             sentimentFields.signal!,
         priceChangePercent: priceResult.status === 'fulfilled'
           ? priceResult.value.priceChangePercent
-          : (mockData?.priceChangePercent ?? 0),
+          : 0,
       })
     : {};
 

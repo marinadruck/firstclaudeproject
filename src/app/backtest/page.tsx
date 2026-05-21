@@ -48,6 +48,12 @@ export default function BacktestPage() {
         </div>
       </header>
 
+      <div className="bg-amber-50 border-b border-amber-200 px-4 py-2.5">
+        <p className="max-w-5xl mx-auto text-xs text-amber-700">
+          <span className="font-semibold">Sample data</span> — backtest/ML results use a small hand-coded AAPL dataset and are not predictive. Replace with real collected data via the future Phase D pipeline.
+        </p>
+      </div>
+
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
         <div>
           <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight mb-1">

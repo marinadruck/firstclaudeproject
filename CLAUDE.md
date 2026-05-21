@@ -23,13 +23,13 @@ Requires Node.js ≥ 18. Install via `brew install node` if not present.
 
 **Entry point:** `src/app/page.tsx` — server component that reads `?ticker=` from the URL and renders `<SearchBar>` + `<Dashboard>`. The ticker flows down as a prop; no client-side router state needed.
 
-**API:** `src/app/api/stock/[ticker]/route.ts` — single `GET` endpoint. Fetches real price data from Finnhub (`currentPrice`, `priceChangePercent`, `priceHistory`) and overlays it on mock data (sentiment, mentions, headlines). Falls back to full mock on any Finnhub error.
+**API:** `src/app/api/stock/[ticker]/route.ts` — single `GET` endpoint. Validates the ticker via `fetchCompanyProfile`, then fetches real data from Finnhub (price), Alpha Vantage (history), NewsAPI (sentiment), and Reddit in parallel. Any failed source falls back to neutral defaults (zeros, empty arrays, "Awaiting…" copy) — no fabricated values.
 
-**Alpha Vantage client:** `src/lib/alphavantage.ts` — calls `TIME_SERIES_DAILY` for 30-day closing prices, parses `"4. close"` field. Caches 12 hours per ticker. Throws on rate limit (`"Note"` field in response) or missing key — route falls back to mock history.
+**Alpha Vantage client:** `src/lib/alphavantage.ts` — calls `TIME_SERIES_DAILY` for 30-day closing prices, parses `"4. close"` field. Caches 12 hours per ticker. Throws on rate limit (`"Note"` field in response) or missing key — route falls back to empty `priceHistory: []`.
 
-**Finnhub client:** `src/lib/finnhub.ts` — two exports: `fetchRealPriceData(ticker)` calls `/quote` for real-time price (30s cache); `fetchCompanyProfile(ticker)` calls `/stock/profile2` to validate a ticker exists and retrieve the company name (24h cache, returns `{ companyName, exists }`). Free tier only; `/stock/candle` (price history) requires a paid plan so `priceHistory` stays mock.
+**Finnhub client:** `src/lib/finnhub.ts` — two exports: `fetchRealPriceData(ticker)` calls `/quote` for real-time price (30s cache); `fetchCompanyProfile(ticker)` calls `/stock/profile2` to validate a ticker exists and retrieve the company name (24h cache, returns `{ companyName, exists }`). Free tier only; `/stock/candle` (price history) requires a paid plan so `priceHistory` comes from Alpha Vantage.
 
-**NewsAPI client:** `src/lib/newsapi.ts` — queries `/v2/everything` for up to 25 recent headlines per ticker, scores each with finance-specific positive/negative keywords (exported as `scoreHeadline`), and generates `newsMentionCount`, `sentimentExplanation`, and `headlines`. Caches 5 minutes. Falls back to mock on any error. Key in `NEWS_API_KEY` env var.
+**NewsAPI client:** `src/lib/newsapi.ts` — queries `/v2/everything` for up to 25 recent headlines per ticker, scores each with finance-specific positive/negative keywords (exported as `scoreHeadline`), and generates `newsMentionCount`, `sentimentExplanation`, and `headlines`. Caches 5 minutes. Key in `NEWS_API_KEY` env var.
 
 **Reddit client:** `src/lib/reddit.ts` — fetches up to 25 posts each from r/wallstreetbets, r/stocks, and r/investing using the public unauthenticated `/search.json` endpoint (no API key required). Reuses `scoreHeadline` from newsapi.ts. Caches 5 minutes. Reddit failure falls back to news-only sentiment. Requires `User-Agent: StockSentimentDashboard/1.0` header.
 
@@ -41,11 +41,9 @@ Requires Node.js ≥ 18. Install via `brew install node` if not present.
 - `NEWS_API_KEY` — free key from https://newsapi.org (100 req/day on developer tier)
 - Reddit requires no API key — uses public unauthenticated endpoint
 
-**Recommendation engine:** `src/lib/recommendations.ts` — pure `computeRecommendation(input)` function. Takes `sentimentScore`, `mentionCount`, `newsMentionCount`, `redditMentionCount`, `signal`, and `priceChangePercent`; returns `priceOutlook` and `recommendation` using 12 priority-ordered rules (hype detection, bullish/bearish alignment, price–sentiment divergence). Called in route.ts after real sentiment is resolved; falls back to mock values if news fetch fails entirely.
+**Recommendation engine:** `src/lib/recommendations.ts` — pure `computeRecommendation(input)` function. Takes `sentimentScore`, `mentionCount`, `newsMentionCount`, `redditMentionCount`, `signal`, and `priceChangePercent`; returns `priceOutlook` and `recommendation` using 12 priority-ordered rules (hype detection, bullish/bearish alignment, price–sentiment divergence). Only called when real sentiment data is available; neutral defaults used otherwise.
 
 **Signal logic:** `src/lib/signals.ts` — pure `computeSignal(mentionCount, sentimentScore)` function. Thresholds are constants at the top; easy to tune. Currently: ≥ 100 mentions → High Attention, ≤ 20 → Low Attention, otherwise Watch.
-
-**Mock data:** `src/lib/mock-data.ts` — five tickers pre-seeded (AAPL, TSLA, NVDA, MSFT, GME) each with 30-day price history and 5–8 headlines. `getMockData` is now used only to provide `priceHistory` for seeded tickers; 404 validation uses `fetchCompanyProfile` instead, so any valid US ticker is supported. Unknown tickers get `priceHistory: []` and real data from Finnhub + NewsAPI + Reddit.
 
 **Types:** all shared interfaces live in `src/types/index.ts` (`StockData`, `Headline`, `PricePoint`, `Signal`).
 
