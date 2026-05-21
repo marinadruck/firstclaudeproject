@@ -65,7 +65,7 @@ export default function Dashboard({ ticker, isSaved, onToggleWatchlist }: Props)
     return (
       <div className="text-center py-20">
         <p className="text-lg font-semibold text-red-500 mb-2">{error ?? 'Ticker not found'}</p>
-        <p className="text-sm text-gray-400">Available tickers: AAPL · TSLA · NVDA · MSFT · GME</p>
+        <p className="text-sm text-gray-400">Enter any US stock ticker (e.g. AAPL, AMZN, GOOG)</p>
       </div>
     );
   }

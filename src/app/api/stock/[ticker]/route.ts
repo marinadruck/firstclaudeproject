@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMockData, applyMockVariation } from '@/lib/mock-data';
-import { fetchRealPriceData } from '@/lib/finnhub';
+import { fetchRealPriceData, fetchCompanyProfile } from '@/lib/finnhub';
 import { fetchRealSentimentData } from '@/lib/newsapi';
 import { fetchRedditSentimentData } from '@/lib/reddit';
 import { computeSignal } from '@/lib/signals';
 import { computeRecommendation } from '@/lib/recommendations';
 import { aggregateAdvancedSentiment } from '@/lib/ai-sentiment';
-import type { Headline, SentimentExplanation, AdvancedSentimentSummary } from '@/types';
+import type { Headline, SentimentExplanation, AdvancedSentimentSummary, Signal, OutlookDirection, ConfidenceLevel } from '@/types';
 
 function buildSummary(
   combined: number,
@@ -33,20 +33,52 @@ export async function GET(
   { params }: { params: { ticker: string } },
 ) {
   const ticker = params.ticker.toUpperCase();
-  const base   = getMockData(ticker);
 
-  if (!base) {
-    return NextResponse.json(
-      { error: `Ticker "${ticker}" not found. Available: AAPL, TSLA, NVDA, MSFT, GME` },
-      { status: 404 },
-    );
+  let companyName: string;
+  try {
+    const profile = await fetchCompanyProfile(ticker);
+    if (!profile.exists) {
+      return NextResponse.json(
+        { error: `Ticker "${ticker}" not found. Enter any US stock ticker (e.g. AAPL, AMZN, GOOG)` },
+        { status: 404 },
+      );
+    }
+    companyName = profile.companyName;
+  } catch {
+    // Profile fetch failed (no key, network) — fall back to mock existence check
+    const mockFallback = getMockData(ticker);
+    if (!mockFallback) {
+      return NextResponse.json(
+        { error: `Ticker "${ticker}" not found. Enter any US stock ticker (e.g. AAPL, AMZN, GOOG)` },
+        { status: 404 },
+      );
+    }
+    companyName = mockFallback.companyName;
   }
 
-  const mockBase = applyMockVariation(base);
+  const mockData = getMockData(ticker);
+  const baseDefaults = mockData
+    ? { ...applyMockVariation(mockData), companyName }
+    : {
+        ticker,
+        companyName,
+        currentPrice: 0,
+        priceChangePercent: 0,
+        mentionCount: 0,
+        newsMentionCount: 0,
+        redditMentionCount: 0,
+        sentimentScore: 0,
+        signal: 'Watch' as Signal,
+        headlines: [],
+        priceHistory: [],
+        sentimentExplanation: { summary: 'Awaiting sentiment data.', keyDrivers: [] },
+        priceOutlook: { direction: 'Neutral' as OutlookDirection, confidence: 'Low' as ConfidenceLevel, explanation: 'Insufficient data to form an outlook.' },
+        recommendation: { action: 'Hold', reasoning: 'Insufficient data to make a recommendation.' },
+      };
 
   const [priceResult, newsResult, redditResult] = await Promise.allSettled([
     fetchRealPriceData(ticker),
-    fetchRealSentimentData(ticker, base.companyName),
+    fetchRealSentimentData(ticker, companyName),
     fetchRedditSentimentData(ticker),
   ]);
 
@@ -112,9 +144,9 @@ export async function GET(
         signal:             sentimentFields.signal!,
         priceChangePercent: priceResult.status === 'fulfilled'
           ? priceResult.value.priceChangePercent
-          : mockBase.priceChangePercent,
+          : (mockData?.priceChangePercent ?? 0),
       })
     : {};
 
-  return NextResponse.json({ ...mockBase, ...priceFields, ...sentimentFields, ...recommendationFields });
+  return NextResponse.json({ ...baseDefaults, ...priceFields, ...sentimentFields, ...recommendationFields });
 }

@@ -25,7 +25,7 @@ Requires Node.js ≥ 18. Install via `brew install node` if not present.
 
 **API:** `src/app/api/stock/[ticker]/route.ts` — single `GET` endpoint. Fetches real price data from Finnhub (`currentPrice`, `priceChangePercent`, `priceHistory`) and overlays it on mock data (sentiment, mentions, headlines). Falls back to full mock on any Finnhub error.
 
-**Finnhub client:** `src/lib/finnhub.ts` — calls `/quote` for real-time price. Caches 30s server-side. Free tier only; `/stock/candle` (price history) requires a paid plan so `priceHistory` stays mock.
+**Finnhub client:** `src/lib/finnhub.ts` — two exports: `fetchRealPriceData(ticker)` calls `/quote` for real-time price (30s cache); `fetchCompanyProfile(ticker)` calls `/stock/profile2` to validate a ticker exists and retrieve the company name (24h cache, returns `{ companyName, exists }`). Free tier only; `/stock/candle` (price history) requires a paid plan so `priceHistory` stays mock.
 
 **NewsAPI client:** `src/lib/newsapi.ts` — queries `/v2/everything` for up to 25 recent headlines per ticker, scores each with finance-specific positive/negative keywords (exported as `scoreHeadline`), and generates `newsMentionCount`, `sentimentExplanation`, and `headlines`. Caches 5 minutes. Falls back to mock on any error. Key in `NEWS_API_KEY` env var.
 
@@ -42,7 +42,7 @@ Requires Node.js ≥ 18. Install via `brew install node` if not present.
 
 **Signal logic:** `src/lib/signals.ts` — pure `computeSignal(mentionCount, sentimentScore)` function. Thresholds are constants at the top; easy to tune. Currently: ≥ 100 mentions → High Attention, ≤ 20 → Low Attention, otherwise Watch.
 
-**Mock data:** `src/lib/mock-data.ts` — five tickers pre-seeded (AAPL, TSLA, NVDA, MSFT, GME) each with 30-day price history and 5–8 headlines. Unknown tickers return `null` → 404.
+**Mock data:** `src/lib/mock-data.ts` — five tickers pre-seeded (AAPL, TSLA, NVDA, MSFT, GME) each with 30-day price history and 5–8 headlines. `getMockData` is now used only to provide `priceHistory` for seeded tickers; 404 validation uses `fetchCompanyProfile` instead, so any valid US ticker is supported. Unknown tickers get `priceHistory: []` and real data from Finnhub + NewsAPI + Reddit.
 
 **Types:** all shared interfaces live in `src/types/index.ts` (`StockData`, `Headline`, `PricePoint`, `Signal`).
 

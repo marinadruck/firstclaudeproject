@@ -42,7 +42,7 @@ export default function PageContent({ ticker }: { ticker: string | undefined }) 
           <p className="text-gray-500 mb-2">
             Enter a ticker symbol to see mention volume, sentiment, price history, and recent headlines.
           </p>
-          <p className="text-sm text-gray-400">Try: AAPL · TSLA · NVDA · MSFT · GME</p>
+          <p className="text-sm text-gray-400">Try: AAPL · AMZN · GOOG · MSFT · TSLA</p>
         </div>
       )}
     </>
