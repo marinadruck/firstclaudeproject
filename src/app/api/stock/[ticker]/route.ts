@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMockData, applyMockVariation } from '@/lib/mock-data';
 import { fetchRealPriceData, fetchCompanyProfile } from '@/lib/finnhub';
+import { fetchPriceHistory } from '@/lib/alphavantage';
 import { fetchRealSentimentData } from '@/lib/newsapi';
 import { fetchRedditSentimentData } from '@/lib/reddit';
 import { computeSignal } from '@/lib/signals';
@@ -76,10 +77,11 @@ export async function GET(
         recommendation: { action: 'Hold', reasoning: 'Insufficient data to make a recommendation.' },
       };
 
-  const [priceResult, newsResult, redditResult] = await Promise.allSettled([
+  const [priceResult, newsResult, redditResult, historyResult] = await Promise.allSettled([
     fetchRealPriceData(ticker),
     fetchRealSentimentData(ticker, companyName),
     fetchRedditSentimentData(ticker),
+    fetchPriceHistory(ticker),
   ]);
 
   if (priceResult.status === 'rejected') {
@@ -91,6 +93,15 @@ export async function GET(
   if (redditResult.status === 'rejected') {
     console.warn(`[reddit] no Reddit data for ${ticker}:`, redditResult.reason);
   }
+  if (historyResult.status === 'rejected') {
+    console.warn(`[alphavantage] mock price history for ${ticker}:`, historyResult.reason);
+  }
+
+  const realHistory        = historyResult.status === 'fulfilled' ? historyResult.value : null;
+  const priceHistoryFields = {
+    priceHistory:       realHistory ?? (mockData?.priceHistory ?? []),
+    priceHistorySource: (realHistory ? 'real' : 'mock') as 'real' | 'mock',
+  };
 
   const priceFields = priceResult.status === 'fulfilled'
     ? { currentPrice: priceResult.value.currentPrice, priceChangePercent: priceResult.value.priceChangePercent }
@@ -148,5 +159,5 @@ export async function GET(
       })
     : {};
 
-  return NextResponse.json({ ...baseDefaults, ...priceFields, ...sentimentFields, ...recommendationFields });
+  return NextResponse.json({ ...baseDefaults, ...priceHistoryFields, ...priceFields, ...sentimentFields, ...recommendationFields });
 }

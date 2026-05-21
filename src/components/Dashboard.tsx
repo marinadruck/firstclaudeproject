@@ -151,6 +151,9 @@ export default function Dashboard({ ticker, isSaved, onToggleWatchlist }: Props)
           Price History — 30 Days
         </p>
         <PriceChart data={data.priceHistory} />
+        <p className="text-xs text-gray-400 mt-2 text-right">
+          {data.priceHistorySource === 'real' ? 'Source: Alpha Vantage' : 'Source: Sample data'}
+        </p>
       </div>
 
       {/* Outlook + recommendation */}

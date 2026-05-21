@@ -25,6 +25,8 @@ Requires Node.js ≥ 18. Install via `brew install node` if not present.
 
 **API:** `src/app/api/stock/[ticker]/route.ts` — single `GET` endpoint. Fetches real price data from Finnhub (`currentPrice`, `priceChangePercent`, `priceHistory`) and overlays it on mock data (sentiment, mentions, headlines). Falls back to full mock on any Finnhub error.
 
+**Alpha Vantage client:** `src/lib/alphavantage.ts` — calls `TIME_SERIES_DAILY` for 30-day closing prices, parses `"4. close"` field. Caches 12 hours per ticker. Throws on rate limit (`"Note"` field in response) or missing key — route falls back to mock history.
+
 **Finnhub client:** `src/lib/finnhub.ts` — two exports: `fetchRealPriceData(ticker)` calls `/quote` for real-time price (30s cache); `fetchCompanyProfile(ticker)` calls `/stock/profile2` to validate a ticker exists and retrieve the company name (24h cache, returns `{ companyName, exists }`). Free tier only; `/stock/candle` (price history) requires a paid plan so `priceHistory` stays mock.
 
 **NewsAPI client:** `src/lib/newsapi.ts` — queries `/v2/everything` for up to 25 recent headlines per ticker, scores each with finance-specific positive/negative keywords (exported as `scoreHeadline`), and generates `newsMentionCount`, `sentimentExplanation`, and `headlines`. Caches 5 minutes. Falls back to mock on any error. Key in `NEWS_API_KEY` env var.
@@ -35,6 +37,7 @@ Requires Node.js ≥ 18. Install via `brew install node` if not present.
 
 **Environment variables** in `.env.local` (never committed):
 - `FINNHUB_API_KEY` — free key from https://finnhub.io
+- `ALPHA_VANTAGE_API_KEY` — free key from https://www.alphavantage.co/support/#api-key (25 req/day on free tier; price history cached 12 hours)
 - `NEWS_API_KEY` — free key from https://newsapi.org (100 req/day on developer tier)
 - Reddit requires no API key — uses public unauthenticated endpoint
 
